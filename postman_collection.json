@@ -1,0 +1,121 @@
+{
+  "info": {
+    "name": "Bookshop API",
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-1234567890ef",
+    "description": "Postman collection for testing CRUD operations of Bookshop API (Books, Authors, Publishers).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List Books",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/books/",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "books", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Publisher",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Acme Publishing\",\n    \"website\": \"https://acme.example\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/publishers/",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "publishers", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Author",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"birth_year\": 1980\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/authors/",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "authors", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Book",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"title\": \"My First Book\",\n    \"price\": 199.99,\n    \"publisher_id\": 1,\n    \"author_ids\": [1]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/books/",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "books", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Author (with validation)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/authors/1/",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "authors", "1", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Publisher (with validation)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/publishers/1/",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "publishers", "1", ""]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    }
+  ]
+}
