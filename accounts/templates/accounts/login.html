@@ -1,0 +1,67 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<h2>Login</h2>
+<form id="loginForm">
+  <label>Username: <input name="username" /></label><br/>
+  <label>Password: <input type="password" name="password"/></label><br/>
+  <button type="submit">Login</button>
+</form>
+<div id="result"></div>
+<script>
+(function(){
+  const access = localStorage.getItem('access');
+  if(access){
+    window.location.href = '/accounts/pages/protected/';
+  }
+})();
+
+document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const form = e.target;
+  const data = {username: form.username.value, password: form.password.value};
+  try{
+    const res = await fetch('/api/accounts/login/', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)});
+    
+    const ct = res.headers.get('content-type') || '';
+    let payload = null;
+    if(ct.indexOf('application/json') !== -1){
+      try{ payload = await res.json(); }catch(err){ payload = String(err); }
+    } else {
+      try{ payload = await res.text(); }catch(err){ payload = String(err); }
+    }
+    if(res.ok){
+    
+    if(payload && payload.access){
+      localStorage.setItem('access', payload.access);
+      localStorage.setItem('refresh', payload.refresh);
+      document.getElementById('result').innerText = 'Logged in';
+      
+      try{ document.cookie = `access=${payload.access}; path=/`; }catch(e){}
+      
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get('next') || '/accounts/pages/protected/';
+      window.location.href = next;
+    } else {
+      document.getElementById('result').innerText = 'Logged in';
+    }
+    } else {
+      
+      if(typeof payload === 'string'){
+        document.getElementById('result').innerText = payload;
+      } else if(payload && payload.detail){
+        const d = Array.isArray(payload.detail) ? payload.detail[0] : payload.detail;
+        document.getElementById('result').innerText = d;
+      } else if(payload && typeof payload === 'object'){
+        try{
+          const first = Object.values(payload)[0];
+          document.getElementById('result').innerText = Array.isArray(first) ? first[0] : String(first);
+        }catch(e){ document.getElementById('result').innerText = JSON.stringify(payload); }
+      } else { document.getElementById('result').innerText = String(payload); }
+    }
+  }catch(err){
+  document.getElementById('result').innerText = 'Network or response parsing error';
+    console.error('Login handler error', err);
+  }
+});
+</script>
+{% endblock %}
