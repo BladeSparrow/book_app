@@ -1,0 +1,55 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<h2>Register</h2>
+<form id="registerForm">
+  <label>Username: <input name="username" /></label><br/>
+  <label>Email: <input name="email" /></label><br/>
+  <label>Password: <input type="password" name="password"/></label><br/>
+  <label>Confirm password: <input type="password" name="password2"/></label><br/>
+  <button type="submit">Register</button>
+</form>
+<div id="result"></div>
+<script>
+(function(){
+  const access = localStorage.getItem('access');
+  if(access){
+    window.location.href = '/accounts/pages/protected/';
+  }
+})();
+
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const data = {
+    username: form.username.value,
+    email: form.email.value,
+    password: form.password.value,
+    password2: form.password2.value
+  };
+  const res = await fetch('/api/accounts/register/', {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)
+  });
+  let payload;
+  try{ payload = await res.json(); }catch(err){ try{ payload = await res.text(); }catch(e){ payload = String(err); } }
+  if(res.ok){
+    document.getElementById('result').innerText = 'Registered successfully';
+    
+    window.location.href = '/accounts/pages/login/';
+  } else {
+    if(typeof payload === 'string'){
+      document.getElementById('result').innerText = payload;
+    } else if(payload && payload.detail){
+      const d = Array.isArray(payload.detail) ? payload.detail[0] : payload.detail;
+      document.getElementById('result').innerText = d;
+    } else if(payload && typeof payload === 'object'){
+      try{
+        const first = Object.values(payload)[0];
+        document.getElementById('result').innerText = Array.isArray(first) ? first[0] : String(first);
+      }catch(e){ document.getElementById('result').innerText = JSON.stringify(payload); }
+    } else {
+      document.getElementById('result').innerText = String(payload);
+    }
+  }
+});
+</script>
+{% endblock %}
