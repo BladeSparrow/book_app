@@ -1,0 +1,47 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<h2>Protected page</h2>
+<p id="welcome">Welcome, ...</p>
+<button id="logoutBtn">Logout</button>
+<div id="msg"></div>
+<script>
+(async function(){
+  const access = localStorage.getItem('access');
+  if(!access){
+    window.location.href = '/accounts/pages/login/?next=/accounts/pages/protected/';
+    return;
+  }
+  try{
+    const resp = await fetch('/protected/', {headers: {'Authorization': 'Bearer ' + access}});
+    if(!resp.ok){
+      
+      localStorage.removeItem('access'); localStorage.removeItem('refresh');
+      window.location.href = '/accounts/pages/login/?next=/accounts/pages/protected/';
+      return;
+    }
+    const json = await resp.json();
+    document.getElementById('welcome').innerText = json.message || 'Welcome!';
+  }catch(e){
+    localStorage.removeItem('access'); localStorage.removeItem('refresh');
+    window.location.href = '/accounts/pages/login/?next=/accounts/pages/protected/';
+    return;
+  }
+
+})();
+
+document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+  const access = localStorage.getItem('access');
+  const refresh = localStorage.getItem('refresh');
+  try{
+    await fetch('/api/accounts/logout/', {
+      method: 'POST', headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + access },
+      body: JSON.stringify({refresh})
+    });
+  }catch(e){}
+  localStorage.removeItem('access');
+  localStorage.removeItem('refresh');
+  document.cookie = 'access=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+  window.location.href = '/accounts/pages/public/';
+});
+</script>
+{% endblock %}
